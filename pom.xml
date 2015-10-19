@@ -4,7 +4,7 @@
   <groupId>com.github.seanroy</groupId>
   <artifactId>lambduh-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   
   <name>lambduh-maven-plugin Maven Mojo</name>
   <description>A maven plugin that deploys functions to AWS Lambda</description>
@@ -65,6 +65,11 @@
     	<artifactId>slf4j-api</artifactId>
     	<version>1.7.12</version>
     </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>1.7.12</version>
+      </dependency>
   </dependencies>
   
   <distributionManagement>
@@ -104,7 +109,7 @@
 			    </execution>
 			</executions>
             </plugin>
-            <plugin>
+            <!--plugin>
 	      <groupId>org.apache.maven.plugins</groupId>
 	      <artifactId>maven-gpg-plugin</artifactId>
 	      <executions>
@@ -116,7 +121,7 @@
 	          </goals>
 	        </execution>
 	      </executions>
-	    </plugin>
+	    </plugin-->
             <plugin>
               <groupId>org.sonatype.plugins</groupId>
               <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -128,6 +133,29 @@
                 <keepStagingRepositoryOnFailure>false</keepStagingRepositoryOnFailure>
               </configuration>
             </plugin>
-  	</plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-plugin-plugin</artifactId>
+            <version>3.3</version>
+
+            <executions>
+                <execution>
+                    <id>default-descriptor</id>
+                    <goals>
+                        <goal>descriptor</goal>
+                    </goals>
+                    <phase>process-classes</phase>
+                </execution>
+                <execution>
+                    <id>help-descriptor</id>
+                    <goals>
+                        <goal>helpmojo</goal>
+                    </goals>
+                    <phase>process-classes</phase>
+                </execution>
+            </executions>
+        </plugin>
+
+    </plugins>
   </build>
 </project>

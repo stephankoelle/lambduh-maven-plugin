@@ -5,17 +5,6 @@ package com.github.seanroy.plugins;
  * deployed to AWS lambda.
  * @author Sean N. Roy
  */
-import java.io.File;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
@@ -23,13 +12,20 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.AWSLambdaClient;
-import com.amazonaws.services.lambda.model.CreateFunctionRequest;
-import com.amazonaws.services.lambda.model.CreateFunctionResult;
-import com.amazonaws.services.lambda.model.DeleteFunctionRequest;
-import com.amazonaws.services.lambda.model.FunctionCode;
+import com.amazonaws.services.lambda.model.*;
 import com.amazonaws.services.lambda.model.Runtime;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Mojo(name = "deploy-lambda")
 public class LambduhMojo extends AbstractMojo {
@@ -63,7 +59,10 @@ public class LambduhMojo extends AbstractMojo {
     private String handler;
 
     @Parameter(property = "runtime", defaultValue = "Java8")
-    private Runtime runtime;
+	private Runtime runtime;
+
+	@Parameter(alias = "process", property = "process", defaultValue = "create")
+	private String process;
 
     /**
      * Lambda function execution timeout. Defaults to maximum allowed.
@@ -103,7 +102,13 @@ public class LambduhMojo extends AbstractMojo {
 
         try {
             uploadJarToS3();
-            deployLambdaFunction();
+
+	        if("create".equalsIgnoreCase(process)) {
+		        deployLambdaFunction();
+	        }
+	        else if("update".equalsIgnoreCase(process)) {
+		        deployLambdaFunction();
+	        }
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.trace(e.getMessage(), e);
@@ -135,6 +140,24 @@ public class LambduhMojo extends AbstractMojo {
 
         return lambdaClient.createFunction(createFunctionRequest);
     }
+
+
+	private UpdateFunctionCodeResult  updateFunction() {
+		UpdateFunctionCodeRequest updateFunctionCodeRequest = new UpdateFunctionCodeRequest();
+		updateFunctionCodeRequest.setFunctionName(functionName);
+		updateFunctionCodeRequest.setS3Bucket(s3Bucket);
+		updateFunctionCodeRequest.setS3Key(fileName);
+
+
+		return lambdaClient.updateFunctionCode(updateFunctionCodeRequest);
+	}
+
+
+	private void updateLamdaFunction()
+	{
+		UpdateFunctionCodeResult result = updateFunction();
+		logger.info("Function updated: " + result.getFunctionArn());
+	}
 
     /**
      * Attempts to delete an existing function of the same name then deploys the
