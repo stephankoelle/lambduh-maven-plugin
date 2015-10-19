@@ -148,8 +148,18 @@ public class LambduhMojo extends AbstractMojo {
 		updateFunctionCodeRequest.setS3Bucket(s3Bucket);
 		updateFunctionCodeRequest.setS3Key(fileName);
 
+		UpdateFunctionConfigurationRequest updateFunctionConfigurationRequest = new UpdateFunctionConfigurationRequest();
+		updateFunctionConfigurationRequest.setDescription(description);
+		updateFunctionConfigurationRequest.setRole(lambdaRoleArn);
+		updateFunctionConfigurationRequest.setFunctionName(functionName);
+		updateFunctionConfigurationRequest.setHandler(handler);
+		updateFunctionConfigurationRequest.setTimeout(timeout);
+		updateFunctionConfigurationRequest.setMemorySize(memorySize);
 
-		return lambdaClient.updateFunctionCode(updateFunctionCodeRequest);
+		final UpdateFunctionConfigurationResult updateFunctionConfigurationResult = lambdaClient.updateFunctionConfiguration(updateFunctionConfigurationRequest);
+		logger.info("Function Configuration updated: " + updateFunctionConfigurationResult.getLastModified());
+
+		return (lambdaClient.updateFunctionCode(updateFunctionCodeRequest));
 	}
 
 
