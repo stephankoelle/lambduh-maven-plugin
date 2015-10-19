@@ -107,7 +107,7 @@ public class LambduhMojo extends AbstractMojo {
 		        deployLambdaFunction();
 	        }
 	        else if("update".equalsIgnoreCase(process)) {
-		        deployLambdaFunction();
+		        updateLamdaFunction();
 	        }
         } catch (Exception e) {
             logger.error(e.getMessage());
