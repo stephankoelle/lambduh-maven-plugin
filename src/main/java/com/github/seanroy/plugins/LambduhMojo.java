@@ -93,6 +93,7 @@ public class LambduhMojo extends AbstractMojo {
             lambdaClient = new AWSLambdaClient();
         }
 
+
         region = Region.getRegion(Regions.fromName(regionName));
         lambdaClient.setRegion(region);
 
@@ -110,9 +111,9 @@ public class LambduhMojo extends AbstractMojo {
 		        updateLamdaFunction();
 	        }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             logger.trace(e.getMessage(), e);
-            throw new MojoExecutionException(e.getMessage());
+            throw new MojoExecutionException(e.getMessage(), e);
         }
     }
 
@@ -136,6 +137,7 @@ public class LambduhMojo extends AbstractMojo {
         FunctionCode functionCode = new FunctionCode();
         functionCode.setS3Bucket(s3Bucket);
         functionCode.setS3Key(fileName);
+
         createFunctionRequest.setCode(functionCode);
 
         return lambdaClient.createFunction(createFunctionRequest);
